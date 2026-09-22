@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Geolocation Compare</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <h1>IP Locator Pro</h1>
+            <p>Comparing top IP Geolocation services in real-time.</p>
+            <button id="locateBtn" class="primary-btn">
+                <span class="btn-text">Detect My Location</span>
+                <span class="loader hidden"></span>
+            </button>
+        </header>
+
+        <section class="results-grid hidden" id="resultsGrid">
+            <!-- IPinfo Card -->
+            <div class="glass-card" id="card-ipinfo">
+                <div class="card-header">
+                    <h2>3. IPinfo.io</h2>
+                    <span class="badge">API</span>
+                </div>
+                <div class="card-content">
+                    <div class="data-row">
+                        <span class="label">IP Address</span>
+                        <span class="value" data-field="ip">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Location</span>
+                        <span class="value" data-field="location">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">ISP / Org</span>
+                        <span class="value" data-field="org">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IP2Location Card -->
+            <div class="glass-card" id="card-ip2location">
+                <div class="card-header">
+                    <h2>2. IP2Location</h2>
+                    <span class="badge">Demo API</span>
+                </div>
+                <div class="card-content">
+                    <div class="data-row">
+                        <span class="label">IP Address</span>
+                        <span class="value" data-field="ip">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Location</span>
+                        <span class="value" data-field="location">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">ISP</span>
+                        <span class="value" data-field="org">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MaxMind Alternative (IP-API) Card -->
+            <div class="glass-card" id="card-ipapi">
+                <div class="card-header">
+                    <h2>1. IP-API (MaxMind Alt)</h2>
+                    <span class="badge">Free API</span>
+                </div>
+                <div class="card-content">
+                    <div class="data-row">
+                        <span class="label">IP Address</span>
+                        <span class="value" data-field="ip">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">Location</span>
+                        <span class="value" data-field="location">-</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">ISP</span>
+                        <span class="value" data-field="org">-</span>
+                    </div>
+                    <p class="note">*MaxMind requires a paid API key, using IP-API as a fallback.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
