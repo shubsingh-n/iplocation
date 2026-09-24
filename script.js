@@ -13,11 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show the grid if it was hidden
         resultsGrid.classList.remove('hidden');
 
+        const metadata = getBrowserMetadata();
+
         // Fetch data simultaneously
         await Promise.all([
-            fetchIPInfo(),
-            fetchIP2Location(),
-            fetchIPAPI()
+            fetchIPInfo(metadata),
+            fetchIPAPI(metadata)
         ]);
 
         // UI State: Done
@@ -27,65 +28,102 @@ document.addEventListener('DOMContentLoaded', () => {
         btnText.textContent = "Refresh Location";
     });
 
-    async function fetchIPInfo() {
+    async function fetchIPInfo(metadata) {
         try {
             const response = await fetch('https://ipinfo.io/json');
             const data = await response.json();
             updateCard('card-ipinfo', {
                 ip: data.ip,
                 location: `${data.city}, ${data.region}, ${data.country}`,
-                org: data.org
+                org: data.org,
+                ...metadata
             });
         } catch (error) {
-            handleError('card-ipinfo');
+            handleError('card-ipinfo', metadata);
         }
     }
 
-    async function fetchIP2Location() {
-        try {
-            // Using their demo API endpoint
-            const response = await fetch('https://api.ip2location.io/?key=demo');
-            const data = await response.json();
-            updateCard('card-ip2location', {
-                ip: data.ip,
-                location: `${data.city_name}, ${data.region_name}, ${data.country_name}`,
-                org: data.as || data.isp || 'N/A'
-            });
-        } catch (error) {
-            handleError('card-ip2location');
-        }
-    }
-
-    async function fetchIPAPI() {
+    async function fetchIPAPI(metadata) {
         try {
             const response = await fetch('/api/ipapi');
             const data = await response.json();
             updateCard('card-ipapi', {
                 ip: data.query,
                 location: `${data.city}, ${data.regionName}, ${data.country}`,
-                org: data.isp
+                org: data.isp,
+                ...metadata
             });
         } catch (error) {
-            handleError('card-ipapi');
+            handleError('card-ipapi', metadata);
         }
+    }
+
+    function getBrowserMetadata() {
+        const ua = navigator.userAgent;
+        let device = 'Desktop';
+        if (/Mobi|Android/i.test(ua)) {
+            device = 'Mobile';
+        } else if (/Tablet|iPad/i.test(ua)) {
+            device = 'Tablet';
+        }
+
+        let os = 'Unknown OS';
+        if (ua.indexOf('Win') !== -1) os = 'Windows';
+        if (ua.indexOf('Mac') !== -1) os = 'MacOS';
+        if (ua.indexOf('Linux') !== -1) os = 'Linux';
+        if (ua.indexOf('Android') !== -1) os = 'Android';
+        if (ua.indexOf('like Mac') !== -1) os = 'iOS';
+
+        let browser = 'Unknown Browser';
+        if (ua.indexOf('Firefox') !== -1) browser = 'Firefox';
+        else if (ua.indexOf('SamsungBrowser') !== -1) browser = 'Samsung Internet';
+        else if (ua.indexOf('Opera') !== -1 || ua.indexOf('OPR') !== -1) browser = 'Opera';
+        else if (ua.indexOf('Trident') !== -1) browser = 'Internet Explorer';
+        else if (ua.indexOf('Edge') !== -1 || ua.indexOf('Edg') !== -1) browser = 'Edge';
+        else if (ua.indexOf('Chrome') !== -1) browser = 'Chrome';
+        else if (ua.indexOf('Safari') !== -1) browser = 'Safari';
+
+        const language = navigator.language || navigator.userLanguage || 'Unknown';
+        const browserStr = `${browser} (${language})`;
+
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+        const localTime = new Date().toLocaleTimeString();
+        const timezoneStr = `${timeZone} / ${localTime}`;
+
+        const referrer = document.referrer || 'Direct';
+
+        return {
+            device: device,
+            os: os,
+            browser: browserStr,
+            timezone: timezoneStr,
+            referrer: referrer
+        };
     }
 
     function updateCard(cardId, data) {
         const card = document.getElementById(cardId);
         if (!card) return;
 
-        card.querySelector('[data-field="ip"]').textContent = data.ip || 'Unknown';
-        card.querySelector('[data-field="location"]').textContent = data.location || 'Unknown';
-        card.querySelector('[data-field="org"]').textContent = data.org || 'Unknown';
+        for (const [key, value] of Object.entries(data)) {
+            const field = card.querySelector(`[data-field="${key}"]`);
+            if (field) {
+                field.textContent = value || 'Unknown';
+            }
+        }
     }
 
-    function handleError(cardId) {
+    function handleError(cardId, metadata) {
+        updateCard(cardId, {
+            ip: 'Error fetching data',
+            location: '-',
+            org: '-',
+            ...metadata
+        });
         const card = document.getElementById(cardId);
-        if (!card) return;
-
-        card.querySelector('[data-field="ip"]').textContent = 'Error fetching data';
-        card.querySelector('[data-field="ip"]').style.color = '#ef4444';
-        card.querySelector('[data-field="location"]').textContent = '-';
-        card.querySelector('[data-field="org"]').textContent = '-';
+        if (card) {
+            const ipField = card.querySelector('[data-field="ip"]');
+            if (ipField) ipField.style.color = '#ef4444';
+        }
     }
 });
